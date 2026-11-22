@@ -1,0 +1,11 @@
+# Compiled Java class files
+*.class
+PorterApp/bin/
+
+# IDE specific files
+.DS_Store
+.idea/
+*.iml
+*.swp
+*~
+

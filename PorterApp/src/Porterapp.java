@@ -63,13 +63,24 @@ class Driver extends User {
 public class Porterapp {
     private static Connection con;
     private static PreparedStatement ps1;
+    private static final Scanner scanner = new Scanner(System.in);
 
     public void jspInit() {
         try {
-            Class.forName("com.mysql.cj.jdbc.Driver").newInstance();
-            con = DriverManager.getConnection("jdbc:mysql://localhost:3306/porterdb", "root", "1234");
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            String dbUrl = System.getProperty("db.url", System.getenv().getOrDefault("DB_URL", "jdbc:mysql://localhost:3306/porterdb?useSSL=false&allowPublicKeyRetrieval=true"));
+            String dbUser = System.getProperty("db.user", System.getenv().getOrDefault("DB_USER", "root"));
+            String defaultPass = System.getProperty("db.password", System.getenv().getOrDefault("DB_PASSWORD", "root@123"));
+
+            try {
+                con = DriverManager.getConnection(dbUrl, dbUser, defaultPass);
+            } catch (SQLException e) {
+                // Try fallback password '1234'
+                con = DriverManager.getConnection(dbUrl, dbUser, "1234");
+            }
             System.out.println("Database connection established.");
         } catch (Exception e) {
+            System.err.println("Database connection failed: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -90,7 +101,6 @@ public class Porterapp {
     }
 
     public static void registerDriver() {
-        Scanner scanner = new Scanner(System.in);
         Driver driver = new Driver();
 
         System.out.print("Enter name: ");
@@ -170,7 +180,6 @@ public class Porterapp {
     }
 
     public static void loginDriver() {
-        Scanner scanner = new Scanner(System.in);
         System.out.print("Enter name: ");
         String name = scanner.nextLine();
         System.out.print("Enter password: ");
@@ -193,7 +202,6 @@ public class Porterapp {
     }
 
     public static void registerUser() {
-        Scanner scanner = new Scanner(System.in);
         User user = new User();
 
         System.out.print("Enter name: ");
@@ -245,7 +253,6 @@ public class Porterapp {
     }
 
     public static void loginUser() {
-        Scanner scanner = new Scanner(System.in);
         System.out.print("Enter name: ");
         String name = scanner.nextLine();
         System.out.print("Enter password: ");
@@ -268,7 +275,6 @@ public class Porterapp {
     }
     public static void bookRide() {
     	System.out.println("Book a Ride");        
-    	Scanner scanner = new Scanner(System.in);
         System.out.print("Enter User ID: ");
         int userId = scanner.nextInt();
         scanner.nextLine(); // Consume newline
@@ -330,7 +336,6 @@ public class Porterapp {
         Porterapp app = new Porterapp();
         app.jspInit();  // Initialize the connection
 
-        Scanner scanner = new Scanner(System.in);
         while (true) {
             System.out.println("Choose an option:");
             System.out.println("1. Register User");
@@ -360,6 +365,7 @@ public class Porterapp {
                 //case 5:
                 	//bookRide();
                 	//break;
+                case 5:
                 case 6:
                     System.out.println("Exiting...");
                     try {
